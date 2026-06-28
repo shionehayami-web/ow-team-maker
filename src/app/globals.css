@@ -1,0 +1,206 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f4f6fb;
+  color: #1f2937;
+  font-family: Arial, sans-serif;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #e5e7eb;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+.hero {
+  margin-bottom: 24px;
+}
+
+.hero h1 {
+  margin: 0 0 8px;
+  font-size: 36px;
+}
+
+.hero p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.bulk {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.bulk label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 10px;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+th {
+  background: #f9fafb;
+}
+
+.memberTable tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+.memberTable tbody tr:nth-child(odd) {
+  background: #ffffff;
+}
+
+.memberTable tbody tr:hover {
+  background: #eef4ff;
+}
+
+input,
+select {
+  width: 100%;
+  min-width: 120px;
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.tabs button.active {
+  background: #2563eb;
+  color: white;
+}
+
+.primary {
+  background: #2563eb;
+  color: white;
+  margin: 12px 0;
+}
+
+.notice {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.error {
+  color: #dc2626;
+  font-weight: bold;
+}
+
+.result {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 2px solid #e5e7eb;
+}
+
+.swapCell,
+.swapName {
+  cursor: pointer;
+}
+
+.swapCell:hover,
+.swapName:hover {
+  background: #dbeafe;
+}
+
+.selectedCell {
+  background: #bfdbfe !important;
+  outline: 2px solid #2563eb;
+  border-radius: 6px;
+}
+
+.actionRow {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+.dangerButton {
+  background: #dc2626;
+  color: white;
+}
+
+.selectedCell {
+  background: #facc15 !important;
+  outline: 3px solid #dc2626;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.swapCell:hover,
+.swapName:hover {
+  background: #fee2e2;
+}
+
+.blueHeader {
+  background: #bfdbfe;
+}
+
+.redHeader {
+  background: #fecdd3;
+}
+
+.blueCell {
+    background:#f4f9ff;
+}
+
+.redCell {
+    background:#fff5f7;
+}
