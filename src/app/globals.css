@@ -204,3 +204,67 @@ select {
 .redCell {
     background:#fff5f7;
 }
+
+.rouletteResult {
+  text-align: center;
+  padding: 24px;
+  margin-bottom: 24px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+}
+
+.rouletteMapName {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.checkLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.checkLabel input {
+  width: auto;
+  min-width: auto;
+}
+
+.voteControl {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.voteControl input {
+  width: 80px;
+  min-width: 80px;
+}
+
+.rolling {
+  animation: pulse 0.18s infinite alternate;
+  color: #2563eb;
+}
+
+.winner {
+  color: #111827;
+}
+
+@keyframes pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+
+  to {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import TeamMaker from "./components/TeamMaker";
+import MapRoulette from "./components/MapRoulette";
 
 export default function Home() {
   const [tab, setTab] = useState<"team" | "map">("team");
