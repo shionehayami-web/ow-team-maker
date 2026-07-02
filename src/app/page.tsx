@@ -23,12 +23,7 @@ export default function Home() {
 
       {tab === "team" && <TeamMaker />}
 
-      {tab === "map" && (
-        <div>
-          <h2>Overwatch Map Roulette</h2>
-          <p>今後実装予定</p>
-        </div>
-      )}
+      {tab === "map" && <MapRoulette />}
     </main>
   );
 }
