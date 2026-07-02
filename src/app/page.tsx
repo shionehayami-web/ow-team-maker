@@ -8,7 +8,7 @@ export default function Home() {
 
   return (
     <main className="page">
-      <h1>ひやじょうの部屋</h1>
+      <h1>Overwatchカスタム主催者向けツール</h1>
 
       <div className="tabs">
         <button onClick={() => setTab("team")}>
