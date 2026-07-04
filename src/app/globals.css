@@ -249,7 +249,22 @@ select {
 }
 
 .winner {
+  animation: winnerPop 0.45s ease-out;
   color: #111827;
+}
+
+@keyframes winnerPop {
+  0% {
+    transform: scale(0.9);
+  }
+
+  60% {
+    transform: scale(1.12);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 @keyframes pulse {
