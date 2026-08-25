@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type MapMode =
     | "Control"
@@ -18,47 +18,56 @@ type MapItem = {
 };
 
 const BASE_MAPS: { name: string; mode: MapMode }[] = [
-  { name: "Busan", mode: "Control" },
-  { name: "Ilios", mode: "Control" },
-  { name: "Lijiang Tower", mode: "Control" },
-  { name: "Nepal", mode: "Control" },
-  { name: "Oasis", mode: "Control" },
-  { name: "Antarctic Peninsula", mode: "Control" },
+    { name: "Busan", mode: "Control" },
+    { name: "Ilios", mode: "Control" },
+    { name: "Lijiang Tower", mode: "Control" },
+    { name: "Nepal", mode: "Control" },
+    { name: "Oasis", mode: "Control" },
+    { name: "Antarctic Peninsula", mode: "Control" },
 
-  { name: "Circuit Royal", mode: "Escort" },
-  { name: "Dorado", mode: "Escort" },
-  { name: "Havana", mode: "Escort" },
-  { name: "Junkertown", mode: "Escort" },
-  { name: "Rialto", mode: "Escort" },
-  { name: "Route 66", mode: "Escort" },
-  { name: "Shambali Monastery", mode: "Escort" },
-  { name: "Watchpoint: Gibraltar", mode: "Escort" },
+    { name: "Circuit Royal", mode: "Escort" },
+    { name: "Dorado", mode: "Escort" },
+    { name: "Havana", mode: "Escort" },
+    { name: "Junkertown", mode: "Escort" },
+    { name: "Rialto", mode: "Escort" },
+    { name: "Route 66", mode: "Escort" },
+    { name: "Shambali Monastery", mode: "Escort" },
+    { name: "Watchpoint: Gibraltar", mode: "Escort" },
 
-  { name: "Blizzard World", mode: "Hybrid" },
-  { name: "Eichenwalde", mode: "Hybrid" },
-  { name: "Hollywood", mode: "Hybrid" },
-  { name: "King's Row", mode: "Hybrid" },
-  { name: "Midtown", mode: "Hybrid" },
-  { name: "Numbani", mode: "Hybrid" },
-  { name: "Paraiso", mode: "Hybrid" },
+    { name: "Blizzard World", mode: "Hybrid" },
+    { name: "Eichenwalde", mode: "Hybrid" },
+    { name: "Hollywood", mode: "Hybrid" },
+    { name: "King's Row", mode: "Hybrid" },
+    { name: "Midtown", mode: "Hybrid" },
+    { name: "Numbani", mode: "Hybrid" },
+    { name: "Paraiso", mode: "Hybrid" },
+    { name: "Neon Junction", mode: "Hybrid" },
 
-  { name: "Colosseo", mode: "Push" },
-  { name: "Esperanca", mode: "Push" },
-  { name: "New Queen Street", mode: "Push" },
+    { name: "Colosseo", mode: "Push" },
+    { name: "Esperanca", mode: "Push" },
+    { name: "New Queen Street", mode: "Push" },
 
-  { name: "New Junk City", mode: "Flashpoint" },
-  { name: "Suravasa", mode: "Flashpoint" },
+    { name: "New Junk City", mode: "Flashpoint" },
+    { name: "Suravasa", mode: "Flashpoint" },
+    { name: "AATLIS", mode: "Flashpoint" },
 ];
 
 const INITIAL_MAPS: MapItem[] = BASE_MAPS.map((map, index) => ({
-  id: index,
-  name: map.name,
-  mode: map.mode,
-  votes: 1,
-  selected: false,
+    id: index,
+    name: map.name,
+    mode: map.mode,
+    votes: 1,
+    selected: false,
 }));
 
 export default function MapRoulette() {
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
     const [maps, setMaps] = useState<MapItem[]>(INITIAL_MAPS);
     const [excludeSelected, setExcludeSelected] = useState(true);
     const [enabledModes, setEnabledModes] = useState<Record<MapMode, boolean>>({
@@ -148,22 +157,23 @@ export default function MapRoulette() {
         if (isRolling) return;
 
         if (candidates.length === 0) {
-            setMessage("当選済みのマップしか残っていません。当選リセットしてください。");
+            setMessage(
+                "当選済みのマップしか残っていません。当選リセットしてください。"
+            );
             return;
         }
 
         setIsRolling(true);
 
-        let count = 0;
-        let delay = 25;
-        const maxCount = 36 + Math.floor(Math.random() * 14);
         const winner = pickWeightedMap(candidates);
+
+        let count = 0;
+        const totalCount = 18;
 
         function roll() {
             count++;
 
-            if (count >= maxCount) {
-                setResult(winner.name);
+            if (count >= totalCount) {
                 setMessage(`${winner.name} に決定！！`);
 
                 setMaps((prev) =>
@@ -181,17 +191,31 @@ export default function MapRoulette() {
                 return;
             }
 
-            const randomMap = candidates[Math.floor(Math.random() * candidates.length)];
-            setResult(randomMap.name);
+            if (count === totalCount - 1) {
+                setResult(winner.name);
+            } else {
+                const randomMap =
+                    candidates[Math.floor(Math.random() * candidates.length)];
 
-            delay = Math.floor(delay * 1.16 + 10);
+                setResult(randomMap.name);
+            }
 
-            timeoutRef.current = setTimeout(roll, delay);
+            let delay: number;
+
+            if (count <= 5) {
+                delay = 90;
+            } else if (count <= 9) {
+                delay = 160;
+            } else {
+                const slowStep = count - 9;
+                delay = 220 + slowStep * 55;
+            }
+
+            setTimeout(roll, delay);
         }
 
         roll();
     }
-
     function toggleMode(mode: MapMode) {
         setEnabledModes((prev) => ({
             ...prev,
@@ -207,7 +231,10 @@ export default function MapRoulette() {
             </section>
 
             <section className="rouletteResult">
-                <div className={`rouletteMapName ${isRolling ? "rolling" : "winner"}`}>
+                <div
+                    className={`rouletteMapName ${isRolling ? "rolling" : result !== "未抽選" ? "winner" : ""
+                        }`}
+                >
                     {result}
                 </div>
 
