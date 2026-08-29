@@ -46,6 +46,7 @@ const BASE_MAPS: { name: string; mode: MapMode }[] = [
     { name: "Colosseo", mode: "Push" },
     { name: "Esperanca", mode: "Push" },
     { name: "New Queen Street", mode: "Push" },
+    { name: "Runasapi", mode: "Push" },
 
     { name: "New Junk City", mode: "Flashpoint" },
     { name: "Suravasa", mode: "Flashpoint" },

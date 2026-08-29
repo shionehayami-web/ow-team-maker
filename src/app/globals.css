@@ -331,15 +331,51 @@ button:disabled {
   }
 }
 
-.voteControl input {
-  text-align: right;
+/* =========================
+   ページ上部・作成者表示
+========================= */
+
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
 }
 
-.selectedColumn {
-  width: 70px;
-  min-width: 70px;
-  max-width: 70px;
-  text-align: center;
-  padding-left: 4px;
-  padding-right: 4px;
+.creator {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* 「作成者：」は少し薄く */
+.creator span {
+  opacity: 0.55;
+}
+
+/* Xアカウント */
+.creatorLink {
+  color: #1d9bf0;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.creatorLink:hover {
+  opacity: 0.7;
+  text-decoration: underline;
+}
+
+/* スマホ表示 */
+@media (max-width: 600px) {
+  .pageHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .creator {
+    justify-content: flex-end;
+  }
 }

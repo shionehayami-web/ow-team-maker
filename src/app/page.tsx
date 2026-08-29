@@ -9,7 +9,23 @@ export default function Home() {
 
   return (
     <main className="page">
-      <h1>Overwatchカスタム主催者向けツール</h1>
+
+      <div className="pageHeader">
+        <h1>Overwatchカスタム主催者向けツール</h1>
+
+        <div className="creator">
+          <span>作成者：</span>
+
+          <a
+            href="https://x.com/Hiyazyo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="creatorLink"
+          >
+            @Hiyazyo
+          </a>
+        </div>
+      </div>
 
       <div className="tabs">
         <button onClick={() => setTab("team")}>

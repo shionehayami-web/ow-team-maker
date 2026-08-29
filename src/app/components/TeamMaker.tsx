@@ -2135,7 +2135,9 @@ export default function TeamMaker() {
   ========================= */
 
   return (
-    <main className="page">
+  <main className="page">
+
+    <section className="card">
 
       <section className="hero">
 
@@ -2149,11 +2151,9 @@ export default function TeamMaker() {
 
       </section>
 
-      <section className="card">
-
-        <h2>
-          チームメンバー入力
-        </h2>
+      <h2>
+        チームメンバー入力
+      </h2>
 
         <div className="bulk">
 
