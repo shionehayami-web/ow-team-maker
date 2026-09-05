@@ -80,7 +80,9 @@ type SlotKey =
   | "red.support1"
   | "red.support2"
   | "spectator.0"
-  | "spectator.1";
+  | "spectator.1"
+  | "spectator.2"
+  | "spectator.3";
 
 type SelectedSlot = {
   matchNo: number;
@@ -625,39 +627,116 @@ function createOneCandidate(
 ):
   | MatchResult[]
   | null {
+  const playerCount =
+    players.length;
+
+  const matchCount =
+    playerCount === 12
+      ? 6
+      : 7;
+
+  const spectatorCount =
+    playerCount - 10;
+
   let remaining =
     new Map<
       number,
       Remaining
     >();
 
-  players.forEach(
-    (p) => {
-      remaining.set(
-        p.id,
-        {
-          tank: 1,
-          damage: 2,
-          support: 2,
-          spectator: 1,
-        }
-      );
-    }
-  );
+  if (playerCount === 13) {
+    /*
+      13人・7試合
+      全員の基本回数：
+      Tank 1 / Damage 2 / Support 2 / 観戦 1
+
+      そこから各プレイヤーに追加1回だけ割り当てる。
+      追加枠は
+      Tank 1人 / Damage 2人 / Support 2人 / 観戦 8人
+      とすることで、全員ちょうど7試合分になる。
+    */
+    const extraRoles: Exclude<
+      Role,
+      never
+    >[] = [
+      "tank",
+      "damage",
+      "damage",
+      "support",
+      "support",
+      ...Array.from(
+        { length: 8 },
+        () =>
+          "spectator" as const
+      ),
+    ];
+
+    const shuffledPlayers =
+      shuffle(players);
+
+    shuffledPlayers.forEach(
+      (p, index) => {
+        const target:
+          Remaining = {
+            tank: 1,
+            damage: 2,
+            support: 2,
+            spectator: 1,
+          };
+
+        const extraRole =
+          extraRoles[index];
+
+        target[extraRole] += 1;
+
+        remaining.set(
+          p.id,
+          target
+        );
+      }
+    );
+  } else {
+    const target:
+      Remaining =
+      playerCount === 14
+        ? {
+            tank: 1,
+            damage: 2,
+            support: 2,
+            spectator: 2,
+          }
+        : {
+            tank: 1,
+            damage: 2,
+            support: 2,
+            spectator: 1,
+          };
+
+    players.forEach(
+      (p) => {
+        remaining.set(
+          p.id,
+          {
+            ...target,
+          }
+        );
+      }
+    );
+  }
 
   const results:
     MatchResult[] = [];
 
   for (
     let matchIndex = 0;
-    matchIndex < 6;
+    matchIndex < matchCount;
     matchIndex++
   ) {
     const matchNo =
       matchIndex + 1;
 
     const remainingMatches =
-      6 - matchIndex;
+      matchCount - matchIndex;
 
     const current =
       cloneRemaining(
@@ -677,7 +756,7 @@ function createOneCandidate(
 
     if (
       forcedSpectators.length >
-      2
+      spectatorCount
     ) {
       return null;
     }
@@ -702,7 +781,7 @@ function createOneCandidate(
           shuffle(
             spectatorCandidates
           ),
-          2 -
+          spectatorCount -
             forcedSpectators.length
         )
       );
@@ -1372,6 +1451,14 @@ export default function TeamMaker() {
     );
 
   const [
+    selectedPlayerCount,
+    setSelectedPlayerCount,
+  ] =
+    useState<
+      12 | 13 | 14
+    >(12);
+
+  const [
     results,
     setResults,
   ] =
@@ -1496,12 +1583,21 @@ export default function TeamMaker() {
     useMemo(() => {
       return players.slice(
         0,
-        12
+        selectedPlayerCount
       );
-    }, [players]);
+    }, [
+      players,
+      selectedPlayerCount,
+    ]);
 
-  const isOver12 =
-    players.length > 12;
+  const isOverSelectedCount =
+    players.length >
+    selectedPlayerCount;
+
+  const matchCount =
+    selectedPlayerCount === 12
+      ? 6
+      : 7;
 
   /* 担当回数 */
 
@@ -1728,16 +1824,29 @@ export default function TeamMaker() {
     setResults([]);
   }
 
+  function selectPlayerCount(
+    count: 12 | 13 | 14
+  ) {
+    setSelectedPlayerCount(
+      count
+    );
+
+    setResults([]);
+    setError("");
+    setSelectedSlot(null);
+  }
+
   function runRoleFixed() {
     setError("");
 
     setResults([]);
 
     if (
-      players.length < 12
+      players.length <
+      selectedPlayerCount
     ) {
       setError(
-        "ロール指定モードは、メンバー名が入力された人を12人以上にしてください。"
+        `ロール指定モードは、メンバー名が入力された人を${selectedPlayerCount}人以上にしてください。`
       );
 
       return;
@@ -1839,15 +1948,17 @@ export default function TeamMaker() {
       return match.red
         .support2;
 
-    if (
-      slotKey ===
-      "spectator.0"
-    )
-      return match
-        .spectators[0];
+    const spectatorIndex =
+      Number(
+        slotKey.split(
+          "."
+        )[1]
+      );
 
     return match
-      .spectators[1];
+      .spectators[
+        spectatorIndex
+      ];
   }
 
   function setPlayerToSlot(
@@ -1942,18 +2053,21 @@ export default function TeamMaker() {
         player;
 
     if (
-      slotKey ===
-      "spectator.0"
-    )
-      next.spectators[0] =
-        player;
+      slotKey.startsWith(
+        "spectator."
+      )
+    ) {
+      const spectatorIndex =
+        Number(
+          slotKey.split(
+            "."
+          )[1]
+        );
 
-    if (
-      slotKey ===
-      "spectator.1"
-    )
-      next.spectators[1] =
-        player;
+      next.spectators[
+        spectatorIndex
+      ] = player;
+    }
 
     return recalcMatch(
       next
@@ -2403,17 +2517,61 @@ export default function TeamMaker() {
           "roleFixed" && (
           <div>
 
+            <div className="tabs">
+              {(
+                [12, 13, 14] as const
+              ).map(
+                (count) => (
+                  <button
+                    key={
+                      count
+                    }
+                    className={
+                      selectedPlayerCount ===
+                      count
+                        ? "active"
+                        : ""
+                    }
+                    onClick={() =>
+                      selectPlayerCount(
+                        count
+                      )
+                    }
+                  >
+                    {count}人
+                  </button>
+                )
+              )}
+            </div>
+
             <h2>
-              ロール指定（12人、6試合）
+              ロール指定（{selectedPlayerCount}人、{matchCount}試合）
             </h2>
 
-            <p>
-              全員が Tank 1回、Damage 2回、Support 2回、観戦 1回になるように分けます。
-            </p>
+            {selectedPlayerCount ===
+              12 && (
+              <p>
+                全員が Tank 1回、Damage 2回、Support 2回、観戦 1回になるように分けます。
+              </p>
+            )}
 
-            {isOver12 && (
+            {selectedPlayerCount ===
+              13 && (
+              <p>
+                Tankは1人が2回・12人が1回、Damageは2人が3回・11人が2回、Supportは2人が3回・11人が2回、観戦は8人が2回・5人が1回になるように分けます。
+              </p>
+            )}
+
+            {selectedPlayerCount ===
+              14 && (
+              <p>
+                全員が Tank 1回、Damage 2回、Support 2回、観戦 2回になるように分けます。
+              </p>
+            )}
+
+            {isOverSelectedCount && (
               <p className="notice">
-                ロール指定モードでは、メンバー表の上から12人を参照します。
+                ロール指定モードでは、メンバー表の上から{selectedPlayerCount}人を参照します。
               </p>
             )}
 
@@ -2752,8 +2910,10 @@ export default function TeamMaker() {
                               p.name
                             }
 
-                            {index ===
-                            0
+                            {index <
+                            match.spectators
+                              .length -
+                              1
                               ? "、"
                               : ""}
                           </span>
@@ -2910,9 +3070,9 @@ export default function TeamMaker() {
             </h3>
 
             <p>
-              メンバー表を12人以上入力してから「チームを分ける」を押してください。
+              「12人」「13人」「14人」から参加人数を選び、選択人数以上のメンバー名を入力してから「チームを分ける」を押してください。
               <br />
-              13人以上入力されている場合、メンバー表の上から12人だけを使って計算します。
+              選択人数を超えて入力されている場合は、メンバー表の上から選択人数分を使って計算します。
             </p>
 
             <h4>
@@ -3001,11 +3161,19 @@ export default function TeamMaker() {
             <ul>
 
               <li>
-                12人・6試合固定でチーム分けを行います。
+                12人は6試合、13人・14人は7試合でチーム分けを行います。
               </li>
 
               <li>
-                各プレイヤーは Tank 1回、Damage 2回、Support 2回、観戦 1回になるように調整します。
+                12人では、全員が Tank 1回、Damage 2回、Support 2回、観戦 1回になるように調整します。
+              </li>
+
+              <li>
+                13人では、Tankは1人が2回・12人が1回、Damageは2人が3回・11人が2回、Supportは2人が3回・11人が2回、観戦は8人が2回・5人が1回になるように調整します。
+              </li>
+
+              <li>
+                14人では、全員が Tank 1回、Damage 2回、Support 2回、観戦 2回になるように調整します。
               </li>
 
               <li>
@@ -3021,7 +3189,7 @@ export default function TeamMaker() {
               </li>
 
               <li>
-                多数の候補を生成し、6試合全体の総合スコアが最も良い結果を採用します。
+                多数の候補を生成し、全試合の総合スコアが最も良い結果を採用します。
               </li>
 
             </ul>
